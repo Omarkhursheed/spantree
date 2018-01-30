@@ -37,7 +37,7 @@ void Graph::removeEdge(int firstVertex, int secondVertex){
 	adjList[secondVertex].erase(remove(adjList[secondVertex].begin(), adjList[secondVertex].end(), firstVertex),adjList[secondVertex].end());
 }
 
-bool containsCycle(int n, bool visitedArray[], int parent){
+bool Graph::containsCycle(int n, bool visitedArray[], int parent){
 	 visitedArray[n] = true;
 	 list<int>::iterator i;
 	 for(i = adjList[n].begin(); i != adjList[n].end(); i++){
@@ -69,10 +69,37 @@ bool Graph::isTree(){
 	return true;
 }
 
-void allSpanTrees(Graph g, int x){
+void allSpanTrees(Graph g, int x, int numberOfEdges){
 	//Select x=numberOfVertices-1 edges from all edges
 	vector<int>::iterator i;
-	int data[numberOfEdges];	
+	bool mask[numberOfEdges];
+	int numbers[numberOfEdges];
+	for(int i = 0; i < numberOfEdges; i++){
+		mask[i] = true;
+		numbers = i;
+	}
+
+	
+}
+void Combo(int arr[], int n, int r){
+	int data[r],
+	comboUtil(arr, n, r, 0, data, 0);
+}
+
+void comboUtil(int arr[], int n, int r, int index, int data[], int i){
+	if(index == r){
+		for(int j = 0; j < r; j++){
+			cout << data[j];
+		}
+		cout << endl;
+	}
+
+	if(i >= n){
+		return;
+	}
+	data[index] = arr[i];
+	comboUtil(arr, n, r, index + 1, data, i+1);
+	comboUtil(arr, n, r, index, data, i+1);
 }
 int main(int argc, char const *argv[])
 {	
