@@ -2,26 +2,32 @@
 #include <cstdlib>
 #include <list>
 #include <tuple>
+#include <vector>
 using namespace std;
-
 class Graph
 {
 public:
 	int numberOfVertices;
-	list<int> *adjList;
-	int adjMatrix[numberOfVertices][numberOfVertices];
+	vector<int> *adjList;
 	bool containsCycle(int n, bool visitedArray[], int parent);
 	vector<int> edgeList;
-	int numberOfEdges = 0;
+	int numberOfEdges;
 	Graph(int numberOfVertices);
 	void insertEdge(int firstVertex, int secondVertex);
 	void removeEdge(int firstVertex, int secondVertex);
+	int getEdges();
 	bool isTree();
+	void printGraph();
 };
 
+void allSpanTrees(Graph *g, int x, int numberOfEdges);
+void comboUtil(Graph *g, bool mask[], int arr[], int n, int r, int index, int data[], int i);
+void Combo(Graph *g, bool mask[],int arr[], int n, int r);
+void printTree(Graph *g, bool mask[], int n);
 Graph::Graph(int numberOfVertices){
 	this->numberOfVertices = numberOfVertices;
-	adjList = new list<int>[numberOfVertices];
+	adjList = new vector<int>[numberOfVertices];
+	//cout<<"GRAPH CREATED!"<<endl;
 }
 
 void Graph::insertEdge(int firstVertex, int secondVertex){
@@ -39,7 +45,7 @@ void Graph::removeEdge(int firstVertex, int secondVertex){
 
 bool Graph::containsCycle(int n, bool visitedArray[], int parent){
 	 visitedArray[n] = true;
-	 list<int>::iterator i;
+	 vector<int>::iterator i;
 	 for(i = adjList[n].begin(); i != adjList[n].end(); i++){
 	 	if(!visitedArray[*i]){
 	 		if(containsCycle(*i, visitedArray, n)){
@@ -74,68 +80,20 @@ int Graph::getEdges(){
 }
 
 void Graph::printGraph(){
-	list<int>::iterator j;
+	vector<int>::iterator j;
 	cout << "Vertex" << "\t Connections" << endl;
 	for(int i = 0; i < numberOfVertices; i++){
 		cout << i << " ";
-		for(j = adjList[v].begin(); j != adjList[v].end(); j++){
-			cout << adjList[v][*j] << " ";
+		for(j = adjList[i].begin(); j != adjList[i].end(); j++){
+			cout << *j << " ";
 		}
-	}
-	cout << endl;
-}
-
-void allSpanTrees(Graph g, int x, int numberOfEdges){
-	//Select x=numberOfVertices-1 edges from all edges
-	bool mask[numberOfEdges];
-	int numbers[numberOfEdges];
-	for(int i = 0; i < numberOfEdges; i++){
-		mask[i] = false;
-		numbers = i;
-	}
-	Combo(g, mask, numbers, numberOfEdges, x);
-	
-}
-void Combo(Graph g, bool mask[],int arr[], int n, int r){
-	int data[r],
-	comboUtil(mask, arr, n, r, 0, data, 0);
-}
-
-void comboUtil(Graph g, bool mask[], int arr[], int n, int r, int index, int data[], int i){
-	if(index == r){
-		for(int j = 0; j < r; j++){
-			cout << data[j];
-			mask[data[j]] = true;
-		}
-		cout << "Spanning Tree: " << endl;
-		printTree(Graph g, mask);
 		cout << endl;
 	}
-
-	if(i >= n){
-		return;
-	}
-	data[index] = arr[i];
-	comboUtil(g, mask, arr, n, r, index + 1, data, i+1);
-	comboUtil(g, mask, arr, n, r, index, data, i+1);
 }
 
-void printTree(Graph g, bool mask[]){
-	Graph gCopy = g;
-	vector<int>::iterator i; 
-	int j = 0; 
-	int x = gCopy.getEdges();
-	i = gCopy.edgeList.begin();
-	for(j = 0; j < x; j++){
-		if(!mask[x]){
-			gCopy.removeEdge(g.edgeList[*i], g.edgeList[*(i+1)]);
-		}
-		i+=2;
-	}
-	if(gCopy.isTree()){
-		gCopy.printGraph();
-	}
-}
+
+
+
 int main(int argc, char const *argv[])
 {	
 	int numberOfVertices;
@@ -146,7 +104,8 @@ int main(int argc, char const *argv[])
 	cin >> numberOfEdges;
 	cout << "Enter the edges: " << endl;
 	
-	Graph g(numberOfVertices);
+	//Graph g(numberOfVertices);
+	Graph *g = new Graph(numberOfVertices);
 	int firstVertex;
 	int secondVertex;
 	for(int i = 0; i < numberOfEdges; i++){
@@ -155,9 +114,95 @@ int main(int argc, char const *argv[])
 		cin >>  firstVertex;
 		cout << "Second Vertex: ";
 		cin >> secondVertex;
-		g.insertEdge(firstVertex, secondVertex);
+		g->insertEdge(firstVertex, secondVertex);
 	}
-
-	allSpanTrees(g, numberOfVertices-1);
+	cout << "Your graph is: " << endl;
+	g->printGraph();
+	allSpanTrees(g, numberOfVertices-1, numberOfEdges);
 	return 0;
+}
+
+void Combo(Graph *g, bool mask[],int arr[], int n, int r){
+	int data[r];
+	comboUtil(g, mask, arr, n, r, 0, data, 0);
+}
+void comboUtil(Graph *g, bool mask[], int arr[], int n, int r, int index, int data[], int i){
+	if (index == r) {
+		for(int j = 0; j < n; j++){
+			mask[j] = false;
+		}
+        for (int j = 0; j < r; j++){
+            cout << data[j] << "\t";
+        	mask[data[j]] = true;
+        }
+        printTree(g, mask, n);
+        cout << endl;
+        return;
+    }
+ 
+    if (i >= n)
+        return;
+	
+	data[index] = arr[i];
+	comboUtil(g, mask, arr, n, r, index + 1, data, i+1);
+	comboUtil(g, mask, arr, n, r, index, data, i+1);
+}
+void allSpanTrees(Graph *g, int x, int numberOfEdges){
+	//Select x=numberOfVertices-1 edges from all edges
+	bool mask[numberOfEdges];
+	int numbers[numberOfEdges];
+	for(int i = 0; i < numberOfEdges; i++){
+		mask[i] = false;
+		numbers[i] = i;
+	}
+	for(int i = 0; i < numberOfEdges; i++){
+		cout << mask[i] << '\t';
+	}
+	cout << endl;
+
+	for(int i = 0; i < numberOfEdges; i++){
+		cout << numbers[i] << '\t';
+	}
+	cout << endl;
+	Combo(g, mask, numbers, numberOfEdges, x);
+	
+}
+
+
+
+
+void printTree(Graph *g, bool mask[], int n){
+	//Graph gCopy(numberOfVertices);
+	Graph *gCopy  = new Graph(g->numberOfVertices);
+	int some = g->numberOfVertices;
+	gCopy->numberOfVertices = some;
+	vector<int>::iterator i;
+	for(int j = 0; j < some; j++){
+		 for(i = g->adjList[j].begin(); i != g->adjList[j].end(); i++){
+		 	gCopy->adjList[j].push_back(*i);
+		 }
+	}
+	for(i = g->edgeList.begin(); i != g->edgeList.end(); i++){
+		gCopy->edgeList.push_back(*i);
+	} 
+	gCopy->numberOfEdges = g->numberOfEdges;
+	int j = 0; 
+	int x = gCopy->getEdges();
+	i = gCopy->edgeList.begin();
+	/*cout << "mask in tree\n";
+	for(int i = 0; i < n; i++){
+		cout << mask[i] << '\t';
+	}*/
+	cout << endl;
+	for(j = 0; j < n; j++){
+		if(!mask[j]){
+			gCopy->removeEdge(*i,*(i+1));
+//			gCopy.removeEdge(gCopy.edgeList[*i], gCopy.edgeList[*(i+1)]);
+		}
+		i+=2;
+	}
+	if(gCopy->isTree()){
+		cout << "Spanning Tree: " << endl;
+		gCopy->printGraph();
+	}
 }
