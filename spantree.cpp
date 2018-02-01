@@ -4,6 +4,8 @@
 #include <tuple>
 #include <vector>
 using namespace std;
+
+int numberOfTrees = 0;
 class Graph
 {
 public:
@@ -83,9 +85,9 @@ void Graph::printGraph(){
 	vector<int>::iterator j;
 	cout << "Vertex" << "\t Connections" << endl;
 	for(int i = 0; i < numberOfVertices; i++){
-		cout << i << " ";
+		cout << i << "\t";
 		for(j = adjList[i].begin(); j != adjList[i].end(); j++){
-			cout << *j << " ";
+			cout << *j << "  ";
 		}
 		cout << endl;
 	}
@@ -110,7 +112,7 @@ int main(int argc, char const *argv[])
 	int secondVertex;
 	for(int i = 0; i < numberOfEdges; i++){
 		cout << "Edge " << i << ":" << endl;
-		cout << "First Vertext: ";
+		cout << "First Vertex: ";
 		cin >>  firstVertex;
 		cout << "Second Vertex: ";
 		cin >> secondVertex;
@@ -122,30 +124,30 @@ int main(int argc, char const *argv[])
 	return 0;
 }
 
-void Combo(Graph *g, bool mask[],int arr[], int n, int r){
-	int data[r];
-	comboUtil(g, mask, arr, n, r, 0, data, 0);
+void Combo(Graph *g, bool mask[],int subsetArray[], int totalNumber, int numberRequested){
+	int data[numberRequested];
+	comboUtil(g, mask, subsetArray, totalNumber, numberRequested, 0, data, 0);
 }
-void comboUtil(Graph *g, bool mask[], int arr[], int n, int r, int index, int data[], int i){
-	if (index == r) {
-		for(int j = 0; j < n; j++){
+void comboUtil(Graph *g, bool mask[], int subsetArray[], int totalNumber, int  numberRequested, int index, int data[], int i){
+	if (index == numberRequested) {
+		for(int j = 0; j < totalNumber; j++){
 			mask[j] = false;
 		}
-        for (int j = 0; j < r; j++){
-            cout << data[j] << "\t";
+        for (int j = 0; j < numberRequested; j++){
+            //cout << data[j] << "\t";
         	mask[data[j]] = true;
         }
-        printTree(g, mask, n);
+        printTree(g, mask, totalNumber);
         cout << endl;
         return;
     }
  
-    if (i >= n)
+    if (i >= totalNumber)
         return;
 	
-	data[index] = arr[i];
-	comboUtil(g, mask, arr, n, r, index + 1, data, i+1);
-	comboUtil(g, mask, arr, n, r, index, data, i+1);
+	data[index] = subsetArray[i];
+	comboUtil(g, mask, subsetArray, totalNumber, numberRequested, index + 1, data, i+1);
+	comboUtil(g, mask, subsetArray, totalNumber, numberRequested, index, data, i+1);
 }
 void allSpanTrees(Graph *g, int x, int numberOfEdges){
 	//Select x=numberOfVertices-1 edges from all edges
@@ -154,14 +156,6 @@ void allSpanTrees(Graph *g, int x, int numberOfEdges){
 	for(int i = 0; i < numberOfEdges; i++){
 		mask[i] = false;
 		numbers[i] = i;
-	}
-	for(int i = 0; i < numberOfEdges; i++){
-		cout << mask[i] << '\t';
-	}
-	cout << endl;
-
-	for(int i = 0; i < numberOfEdges; i++){
-		cout << numbers[i] << '\t';
 	}
 	cout << endl;
 	Combo(g, mask, numbers, numberOfEdges, x);
@@ -202,7 +196,7 @@ void printTree(Graph *g, bool mask[], int n){
 		i+=2;
 	}
 	if(gCopy->isTree()){
-		cout << "Spanning Tree: " << endl;
+		cout << "Spanning Tree " << ++numberOfTrees << endl;
 		gCopy->printGraph();
 	}
 }
